@@ -2,26 +2,26 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>ExampleSite</title>
-    <link>http://localhost:1313/log/</link>
+    <link>https://ningorgf.github.io/log/</link>
     <description>Recent content on ExampleSite</description>
     <image>
       <title>ExampleSite</title>
-      <url>http://localhost:1313/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>http://localhost:1313/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <url>https://ningorgf.github.io/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://ningorgf.github.io/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Thu, 22 Feb 2024 15:23:51 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/log/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://ningorgf.github.io/log/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>First Sample</title>
-      <link>http://localhost:1313/log/posts/first/</link>
+      <link>https://ningorgf.github.io/log/posts/first/</link>
       <pubDate>Thu, 22 Feb 2024 15:23:51 +0800</pubDate>
-      <guid>http://localhost:1313/log/posts/first/</guid>
-      <description>Hugging face demo Pipeline for a chatbot based on logs
+      <guid>https://ningorgf.github.io/log/posts/first/</guid>
+      <description>Hugging face demo Pipeline for a chatbot based on my logs
 get the log files colab test
 Hugging face space Visit https://huggingface.co/new-space and fill in the form.
-Gradio Demo </description>
+LangChain Bug log Chatbot: LangChain -&amp;gt; generates prompt and process -&amp;gt; LLM -&amp;gt; Generates response. In principle, for blogs and these short contests, it is sufficient to directly generate a prompt+query using LLM. Using LangChain system that is still being developed, is overly complicated.</description>
     </item>
   </channel>
 </rss>
