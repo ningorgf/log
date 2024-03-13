@@ -2,22 +2,29 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Posts on ExampleSite</title>
-    <link>https://ningorgf.github.io/log/posts/</link>
+    <link>http://localhost:1313/log/posts/</link>
     <description>Recent content in Posts on ExampleSite</description>
     <image>
       <title>ExampleSite</title>
-      <url>https://ningorgf.github.io/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>https://ningorgf.github.io/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+      <url>http://localhost:1313/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 22 Feb 2024 15:23:51 +0800</lastBuildDate>
-    <atom:link href="https://ningorgf.github.io/log/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 13 Mar 2024 13:58:16 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/log/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Small Dit</title>
+      <link>http://localhost:1313/log/posts/small-dit/</link>
+      <pubDate>Wed, 13 Mar 2024 13:58:16 +0800</pubDate>
+      <guid>http://localhost:1313/log/posts/small-dit/</guid>
+      <description>Attempt to replicate a mini DiT model. While studying a paper, I found it challenging to comprehend the Loss, so I decided to explore the code implementation of loss. The code is based on some intros from CS294-158-SP24 Deep Unsupervised Learning Spring 2024 https://sites.google.com/view/berkeley-cs294-158-sp24/home. (I recommend checking out their YouTube course, which covers a lot of the latest papers and interpretations. The homeworks also offer a great deal of freedom, allowing you to be quite creative.</description>
+    </item>
     <item>
       <title>First Sample</title>
-      <link>https://ningorgf.github.io/log/posts/first/</link>
+      <link>http://localhost:1313/log/posts/first/</link>
       <pubDate>Thu, 22 Feb 2024 15:23:51 +0800</pubDate>
-      <guid>https://ningorgf.github.io/log/posts/first/</guid>
+      <guid>http://localhost:1313/log/posts/first/</guid>
       <description>Hugging face demo Pipeline for a chatbot based on my logs
 get the log files colab test
 Hugging face space Visit https://huggingface.co/new-space and fill in the form.

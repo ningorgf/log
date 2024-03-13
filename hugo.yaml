@@ -26,6 +26,7 @@ params:
   defaultTheme: auto # dark, light
   disableThemeToggle: false
 
+  math: true
   ShowReadingTime: true
   ShowShareButtons: false
   ShowPostNavLinks: true

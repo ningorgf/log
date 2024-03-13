@@ -1,0 +1,308 @@
+<!doctype html><html lang=en dir=auto><head><script src="/log/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=log/livereload" data-no-instant defer></script><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Small Dit | ExampleSite</title>
+<meta name=keywords content><meta name=description content="Attempt to replicate a mini DiT model. While studying a paper, I found it challenging to comprehend the Loss, so I decided to explore the code implementation of loss. The code is based on some intros from CS294-158-SP24 Deep Unsupervised Learning Spring 2024 https://sites.google.com/view/berkeley-cs294-158-sp24/home. (I recommend checking out their YouTube course, which covers a lot of the latest papers and interpretations. The homeworks also offer a great deal of freedom, allowing you to be quite creative."><meta name=author content="Nxxxxx"><link rel=canonical href=http://localhost:1313/log/posts/small-dit/><meta name=google-site-verification content="XYZabc"><meta name=yandex-verification content="XYZabc"><meta name=msvalidate.01 content="XYZabc"><link crossorigin=anonymous href=/log/assets/css/stylesheet.b609c58d5c11bb90b1a54e04005d74ad1ddf22165eb79f5533967e57df9c3b50.css integrity="sha256-tgnFjVwRu5CxpU4EAF10rR3fIhZet59VM5Z+V9+cO1A=" rel="preload stylesheet" as=style><link rel=icon href=http://localhost:1313/log/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=16x16 href=http://localhost:1313/log/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=32x32 href=http://localhost:1313/log/%3Clink%20/%20abs%20url%3E><link rel=apple-touch-icon href=http://localhost:1313/log/%3Clink%20/%20abs%20url%3E><link rel=mask-icon href=http://localhost:1313/log/%3Clink%20/%20abs%20url%3E><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=http://localhost:1313/log/posts/small-dit/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css integrity=sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js integrity=sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js integrity=sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR crossorigin=anonymous onload=renderMathInElement(document.body)></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script><script>var doNotTrack=!1;doNotTrack||(function(e,t,n,s,o,i,a){e.GoogleAnalyticsObject=o,e[o]=e[o]||function(){(e[o].q=e[o].q||[]).push(arguments)},e[o].l=1*new Date,i=t.createElement(n),a=t.getElementsByTagName(n)[0],i.async=1,i.src=s,a.parentNode.insertBefore(i,a)}(window,document,"script","https://www.google-analytics.com/analytics.js","ga"),ga("create","UA-123-45","auto"),ga("send","pageview"))</script><meta property="og:title" content="Small Dit"><meta property="og:description" content="Attempt to replicate a mini DiT model. While studying a paper, I found it challenging to comprehend the Loss, so I decided to explore the code implementation of loss. The code is based on some intros from CS294-158-SP24 Deep Unsupervised Learning Spring 2024 https://sites.google.com/view/berkeley-cs294-158-sp24/home. (I recommend checking out their YouTube course, which covers a lot of the latest papers and interpretations. The homeworks also offer a great deal of freedom, allowing you to be quite creative."><meta property="og:type" content="article"><meta property="og:url" content="http://localhost:1313/log/posts/small-dit/"><meta property="og:image" content="http://localhost:1313/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta property="article:section" content="posts"><meta property="article:published_time" content="2024-03-13T13:58:16+08:00"><meta property="article:modified_time" content="2024-03-13T13:58:16+08:00"><meta property="og:site_name" content="ExampleSite"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="http://localhost:1313/log/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:title content="Small Dit"><meta name=twitter:description content="Attempt to replicate a mini DiT model. While studying a paper, I found it challenging to comprehend the Loss, so I decided to explore the code implementation of loss. The code is based on some intros from CS294-158-SP24 Deep Unsupervised Learning Spring 2024 https://sites.google.com/view/berkeley-cs294-158-sp24/home. (I recommend checking out their YouTube course, which covers a lot of the latest papers and interpretations. The homeworks also offer a great deal of freedom, allowing you to be quite creative."><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"http://localhost:1313/log/posts/"},{"@type":"ListItem","position":2,"name":"Small Dit","item":"http://localhost:1313/log/posts/small-dit/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Small Dit","name":"Small Dit","description":"Attempt to replicate a mini DiT model. While studying a paper, I found it challenging to comprehend the Loss, so I decided to explore the code implementation of loss. The code is based on some intros from CS294-158-SP24 Deep Unsupervised Learning Spring 2024 https://sites.google.com/view/berkeley-cs294-158-sp24/home. (I recommend checking out their YouTube course, which covers a lot of the latest papers and interpretations. The homeworks also offer a great deal of freedom, allowing you to be quite creative.","keywords":[],"articleBody":"Attempt to replicate a mini DiT model. While studying a paper, I found it challenging to comprehend the Loss, so I decided to explore the code implementation of loss. The code is based on some intros from CS294-158-SP24 Deep Unsupervised Learning Spring 2024 https://sites.google.com/view/berkeley-cs294-158-sp24/home. (I recommend checking out their YouTube course, which covers a lot of the latest papers and interpretations. The homeworks also offer a great deal of freedom, allowing you to be quite creative.)\nVAE For a detailed introduction, refer to the wiki.\nFig1：resourse\n$z=\\mu_{\\phi}(x)+L_{\\phi}(x)\\epsilon$\nReparametrisation trick allows the error to be backpropagated through the network.\nAlthough this homework requires encoding to generate z with the dimensions of (B, 4, 8, 8), I modified it in the code to be (B, 2 * 4, 8, 8).\nclass VAE(nn.Module): def __init__(self): def encode(self, x): encoded = self.encoder(x) mu, log_var = encoded.chunk(2, dim=1) # Split the encoded values into mu and log_var return self.reparameterize(mu, log_var), mu, log_var def reparameterize(self, mu, log_var): std = torch.exp(0.5*log_var) eps = torch.randn_like(std) return mu + eps*std def decode(self, z): return self.decoder(z) def forward(self, x): z, mu, log_var = self.encode(x) return self.decode(z), mu, log_var @property def latent_shape(self): return (4, 8, 8) # Loss function def vae_loss(recon_x, x, mu, log_var): recon_loss = F.mse_loss(recon_x, x, reduction='sum') kl_divergence = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp()) return recon_loss + kl_divergence LDM Fig2. High-Resolution Image Synthesis with Latent Diffusion Models\nDiT These Diffusion Transformers (DiTs), replace the commonly-used U-Net backbone with a transformer that operates on latent patches of images. The authors conduct an analysis of the scalability of their DiTs by examining the forward pass complexity, measured in Giga FLoating-point Operations Per Second (GFlops). It was found that DiTs with a higher number of GFlops - achieved through increased transformer depth/width or an escalated number of input tokens - consistently have lower Fréchet Inception Distance (FID), a measure of similarity between sets of images. In addition to their scalability, the largest of these DiTs (‘DiT-XL/2’) outperform all prior diffusion models on 512x512 and 256x256 class-conditional ImageNet benchmarks, achieving a state-of-the-art FID of 2.27 on the latter.\nFig 3: The Diffusion Transformer (DiT) architecture. Left: We train conditional latent DiT models. The input latent is decomposed into patches and processed by several DiT blocks. Right: Details of our DiT blocks. We experiment with variants of standard transformer blocks that incorporate conditioning via adaptive layer norm, cross-attention and extra input tokens. Adaptive layer norm works best.\nThe connection between portions of the pseudocode and Figure 3: DiT(input_shape, patch_size, hidden_size, num_heads, num_layers, num_classes, cfg_dropout_prob) Given x (B x C x H x W) - image, y (B) - class label, t (B) - diffusion timestep x = patchify_flatten(x) # B x C x H x W -\u003e B x (H // P * W // P) x D, P is patch_size x += pos_embed # see get_2d_sincos_pos_embed t = compute_timestep_embedding(t) # Same as in UNet if training: y = dropout_classes(y, cfg_dropout_prob) # Randomly dropout to train unconditional image generation y = Embedding(num_classes + 1, hidden_size)(y) # y = c (B x D) c = t + y #c (B x D) for _ in range(num_layers): x = DiTBlock(hidden_size, num_heads)(x, c) # x (B x L x D), c (B x D) x = FinalLayer(hidden_size, patch_size, out_channels)(x) x = unpatchify(x) # B x (H // P * W // P) x (P * P * 2C) -\u003e B x 2C x H x W return x Based on the pseudocode, I’ve constructed a mini DiT; the code is at the end of the document. This code isn’t universally executable. For the full version of DiT, please refer to the paper’s GitHub.\nLoss The structure of the input and output are not the same. As mentioned in the paper, (reparameterize $\\mu_{\\phi}$), the model can be trained using a simple mean-squared error between the predicted noise $\\epsilon_{\\theta}(x_{t})$ and the sampled ground truth Gaussian noise $\\epsilon_{t}$ (the z in the VAE).\nHowever, to train diffusion models with a learned reverse process covariance, the full $D_{KL}$ term needs to be optimized.The following source code may help in understanding the loss:\nDiT/diffusion/diffusion_utils.py、 def normal_kl(mean1, logvar1, mean2, logvar2): return 0.5 * ( -1.0 + logvar2 - logvar1 + th.exp(logvar1 - logvar2) + ((mean1 - mean2) ** 2) * th.exp(-logvar2) ) DiT/diffusion/gaussian_diffusion.py assert model_output.shape == target.shape == x_start.shape terms[\"mse\"] = mean_flat((target - model_output) ** 2) if \"vb\" in terms: terms[\"loss\"] = terms[\"mse\"] + terms[\"vb\"] else: terms[\"loss\"] = terms[\"mse\"] p_sample sample = out[\"mean\"] + nonzero_mask * th.exp(0.5 * out[\"log_variance\"]) * noise return {\"sample\": sample, \"pred_xstart\": out[\"pred_xstart\"]} code the final layer’s out_channels is 2C.\ndef get_1d_sincos_pos_embed_from_grid(embed_dim, pos): assert embed_dim % 2 == 0 omega = torch.arange(embed_dim // 2, dtype=torch.float32) omega /= (embed_dim // 2) / 2.0 omega = 1.0 / (10000 ** omega) # (D/2,) pos = pos.reshape(-1) # (M,) out = torch.einsum('m,d-\u003emd', pos, omega) # (M, D/2), outer product emb_sin = torch.sin(out) # (M, D/2) emb_cos = torch.cos(out) # (M, D/2) emb = torch.cat([emb_sin, emb_cos], dim=1) # (M, D) return emb def get_2d_sincos_pos_embed_from_grid(embed_dim, grid): assert embed_dim % 2 == 0 # use half of dimensions to encode grid_h emb_h = get_1d_sincos_pos_embed_from_grid(embed_dim // 2, grid[0]) # (H*W, D/2) emb_w = get_1d_sincos_pos_embed_from_grid(embed_dim // 2, grid[1]) # (H*W, D/2) emb = torch.cat([emb_h, emb_w], dim=1) # (H*W, D) return emb def get_2d_sincos_pos_embed(embed_dim, grid_size): grid_h = torch.arange(grid_size).float() grid_w = torch.arange(grid_size).float() grid = torch.meshgrid(grid_w, grid_h) # here w goes first grid = torch.stack(grid, dim=0) grid = grid.reshape(2, 1, grid_size, grid_size) pos_embed = get_2d_sincos_pos_embed_from_grid(embed_dim, grid) return pos_embed # Example usage: embed_dim = 768 # Example embedding dimension grid_size = 16 # Example grid size pos_embed = get_2d_sincos_pos_embed(embed_dim, grid_size) # get_2d_sincos_pos_embed(C * patch_size * patch_size, H // patch_size).reshape(1, H // patch_size * W // patch_size, -1).repeat(B, 1, 1) get_2d_sincos_pos_embed(2 * 4 * 4, 12 // 4).reshape(1, 3 * 3, -1).shape # @title DiTBlock def modulate(x, shift, scale): return x * (1 + scale.unsqueeze(1)) + shift.unsqueeze(1) class DiTBlock(nn.Module): def __init__(self, hidden_size, num_heads): super(DiTBlock, self).__init__() # Define the layers used in DiTBlock self.silu = nn.SiLU() self.linear_c = nn.Linear(hidden_size, 6 * hidden_size) self.norm1 = nn.LayerNorm(hidden_size, elementwise_affine=False) self.norm2 = nn.LayerNorm(hidden_size, elementwise_affine=False) self.attention = nn.MultiheadAttention(hidden_size, num_heads) # Define an MLP. Adjust the architecture as needed. self.mlp = nn.Sequential( nn.Linear(hidden_size, 4 * hidden_size), nn.SiLU(), nn.Linear(4 * hidden_size, hidden_size) ) def forward(self, x, c): # Process context vector c = self.silu(c) c = self.linear_c(c) shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = c.chunk(6, dim=1) # First half of the DiTBlock (MSA) h = self.norm1(x) h = modulate(h, shift_msa, scale_msa) attn_output, _ = self.attention(h, h, h) x = x + gate_msa.unsqueeze(1) * attn_output # Second half of the DiTBlock (MLP) h = self.norm2(x) h = modulate(h, shift_mlp, scale_mlp) mlp_output = self.mlp(h) x = x + gate_mlp.unsqueeze(1) * mlp_output return x # @title FinalLayer class FinalLayer(nn.Module): def __init__(self, hidden_size, patch_size, out_channels): super(FinalLayer, self).__init__() # Define the layers used in FinalLayer self.silu = nn.SiLU() self.linear_c = nn.Linear(hidden_size, 2 * hidden_size) self.norm = nn.LayerNorm(hidden_size, elementwise_affine=False) self.final_linear = nn.Linear(hidden_size, patch_size * patch_size * out_channels) def forward(self, x, c): # Process context vector c = self.silu(c) c = self.linear_c(c) shift, scale = c.chunk(2, dim=1) # Apply LayerNorm and Modulation x = self.norm(x) x = modulate(x, shift, scale) # Apply final linear layer x = self.final_linear(x) return x def timestep_embedding(timesteps, dim, max_period=10000): half_dim = dim // 2 device = timesteps.device freqs = torch.exp(-torch.log(torch.tensor(max_period, device=device)) * torch.arange(0, half_dim, dtype=torch.float32, device=device) / half_dim) args = timesteps[:, None].to(device=device, dtype=torch.float32) * freqs[None] embedding = torch.cat([torch.cos(args), torch.sin(args)], dim=-1) if dim % 2: # If dim is odd, pad with a column of zeros embedding = F.pad(embedding, (0, 1)) return embedding import torch def patchify_flatten(imgs, patch_size): B, C, H, W = imgs.shape patch_flat_dim = C * patch_size * patch_size # Step 1: Reshape imgs = imgs.reshape(B, C, H // patch_size, patch_size, W // patch_size, patch_size) # Step 2: Transpose to B x num_patches x patch_flat_dim imgs = imgs.permute(0, 2, 4, 3, 5, 1).reshape(B, -1, patch_flat_dim) return imgs def unpatchify(x, patch_size, H, W): \"\"\" Args: - x: the flattened patches tensor, shape (B, num_patches, patch_depth) - patch_size: the size of one side of the square patch - H: the height of the original image - W: the width of the original image Returns: - img: the reconstructed image tensor, shape (B, C, H, W) \"\"\" B, num_patches, patch_depth = x.shape C = patch_depth // (patch_size * patch_size) # Step 1: Reshape to (B, H // patch_size, W // patch_size, patch_size, patch_size, C) x = x.reshape(B, H // patch_size, W // patch_size, patch_size, patch_size, C) # Step 2: Transpose to (B, C, H // patch_size, patch_size, W // patch_size, patch_size) x = x.permute(0, 5, 1, 3, 2, 4) # Step 3: Reshape to the original image shape (B, C, H, W) img = x.reshape(B, C, H, W) return img def dropout_classes(y, dropout_prob): # During training, randomly set some entries to -1 to indicate the special no-class case mask = torch.rand_like(y, dtype=torch.float32) \u003c dropout_prob y[mask] = y_max+1; return y class DiT(nn.Module): # Initialization remains the same as previously provided def __init__(self, input_shape, patch_size, hidden_size, num_heads, num_layers, num_classes, cfg_dropout_prob): super(DiT, self).__init__() self.patch_size = patch_size self.hidden_size = hidden_size self.num_layers = num_layers self.cfg_dropout_prob = cfg_dropout_prob # Assuming C, H, W are the channels, height, and width of the input C, H, W = input_shape self.D = C * (patch_size ** 2) # Depth of the flattened patches self.num_patches = (H // patch_size) * (W // patch_size) grid_size = max(H // patch_size, W // patch_size) self.pos_embed = get_2d_sincos_pos_embed(self.D , grid_size) # Embedding layer for class labels self.class_embedding = nn.Embedding(num_classes + 1, hidden_size) # Stack of DiTBlocks self.diT_blocks = nn.ModuleList([DiTBlock(hidden_size, num_heads) for _ in range(num_layers)]) # Final layer to map to output space self.final_layer = FinalLayer(hidden_size, patch_size, 2 * C) def forward(self, x, y, t, training=True): B, C, H, W = x.shape # Patchify and flatten input images print(x.shape) x = patchify_flatten(x, self.patch_size) # Needs to be implemented # Add positional embedding print(x.shape) x += self.pos_embed.reshape(1, H // self.patch_size * W // self.patch_size, -1).repeat(B, 1, 1) print(x.shape) # Compute timestep embedding using the PyTorch-based function t_emb = timestep_embedding(t, C * self.patch_size * self.patch_size) print(t_emb.shape) # Apply dropout to class labels if training if training: y = dropout_classes(y, self.cfg_dropout_prob) # Embed class labels y_emb = self.class_embedding(y) print('y_emb') print(y_emb.shape) # Combine timestep and class label embeddings c = t_emb + y_emb # Pass the input through DiTBlocks for diT_block in self.diT_blocks: x = diT_block(x, c) # Pass the output through the final layer x = self.final_layer(x, c) # Unpatchify the output to obtain the final image x = unpatchify(x, self.patch_size, H, W) return x ","wordCount":"1746","inLanguage":"en","datePublished":"2024-03-13T13:58:16+08:00","dateModified":"2024-03-13T13:58:16+08:00","author":{"@type":"Person","name":"Nxxxxx"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:1313/log/posts/small-dit/"},"publisher":{"@type":"Organization","name":"ExampleSite","logo":{"@type":"ImageObject","url":"http://localhost:1313/log/%3Clink%20/%20abs%20url%3E"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=http://localhost:1313/log/ accesskey=h title="Home (Alt + H)"><img src=http://localhost:1313/apple-touch-icon.png alt aria-label=logo height=35>Home</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></div></div><ul id=menu><li><a href=http://localhost:1313/log/categories/ title=categories><span>categories</span></a></li><li><a href=http://localhost:1313/log/tags/ title=tags><span>tags</span></a></li><li><a href=https://huggingface.co/spaces/NingHugginngFake223/chatdemo title=chatdemo.org><span>chatdemo.org</span>&nbsp;<svg fill="none" shape-rendering="geometricPrecision" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=http://localhost:1313/log/>Home</a>&nbsp;»&nbsp;<a href=http://localhost:1313/log/posts/>Posts</a></div><h1 class="post-title entry-hint-parent">Small Dit</h1><div class=post-meta><span title='2024-03-13 13:58:16 +0800 CST'>March 13, 2024</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;1746 words&nbsp;·&nbsp;Nxxxxx</div></header><div class=post-content><p>Attempt to replicate a mini DiT model. While studying a paper, I found it challenging to comprehend the Loss, so I decided to explore the code implementation of loss. The code is based on some intros from CS294-158-SP24 Deep Unsupervised Learning Spring 2024 <a href=https://sites.google.com/view/berkeley-cs294-158-sp24/home>https://sites.google.com/view/berkeley-cs294-158-sp24/home</a>. (I recommend checking out their YouTube course, which covers a lot of the latest papers and interpretations. The homeworks also offer a great deal of freedom, allowing you to be quite creative.)</p><h3 id=vae>VAE<a hidden class=anchor aria-hidden=true href=#vae>#</a></h3><p>For a detailed introduction, refer to the <a href=https://en.wikipedia.org/wiki/Variational_autoencoder>wiki</a>.</p><p><img loading=lazy src=../images/f1.png alt=f1>
+Fig1：<a href=https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73>resourse</a></p><p>$z=\mu_{\phi}(x)+L_{\phi}(x)\epsilon$</p><p>Reparametrisation trick allows the error to be backpropagated through the network.</p><p>Although this homework requires encoding to generate z with the dimensions of (B, 4, 8, 8), I modified it in the code to be (B, 2 * 4, 8, 8).</p><pre tabindex=0><code>class VAE(nn.Module):
+    def __init__(self):
+
+
+    def encode(self, x):
+        encoded = self.encoder(x)
+        mu, log_var = encoded.chunk(2, dim=1)  # Split the encoded values into mu and log_var
+        return self.reparameterize(mu, log_var), mu, log_var
+
+
+    def reparameterize(self, mu, log_var):
+        std = torch.exp(0.5*log_var)
+        eps = torch.randn_like(std)
+        return mu + eps*std
+
+
+    def decode(self, z):
+        return self.decoder(z)
+
+
+    def forward(self, x):
+        z, mu, log_var = self.encode(x)
+        return self.decode(z), mu, log_var
+
+
+    @property
+    def latent_shape(self):
+        return (4, 8, 8)
+
+
+# Loss function
+def vae_loss(recon_x, x, mu, log_var):
+    recon_loss = F.mse_loss(recon_x, x, reduction=&#39;sum&#39;)
+    kl_divergence = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
+    return recon_loss + kl_divergence
+</code></pre><h3 id=ldm>LDM<a hidden class=anchor aria-hidden=true href=#ldm>#</a></h3><p><img loading=lazy src=../images/f2.png alt=f2>
+Fig2. <a href=https://arxiv.org/pdf/2112.10752.pdf>High-Resolution Image Synthesis with Latent Diffusion Models</a></p><h3 id=dit>DiT<a hidden class=anchor aria-hidden=true href=#dit>#</a></h3><p>These Diffusion Transformers (DiTs), replace the commonly-used U-Net backbone with a transformer that operates on latent patches of images. The authors conduct an analysis of the scalability of their DiTs by examining the forward pass complexity, measured in Giga FLoating-point Operations Per Second (GFlops). It was found that DiTs with a higher number of GFlops - achieved through increased transformer depth/width or an escalated number of input tokens - consistently have lower Fréchet Inception Distance (FID), a measure of similarity between sets of images. In addition to their scalability, the largest of these DiTs (&lsquo;DiT-XL/2&rsquo;) outperform all prior diffusion models on 512x512 and 256x256 class-conditional ImageNet benchmarks, achieving a state-of-the-art FID of 2.27 on the latter.</p><p><img loading=lazy src=../images/dit.png alt=f3>
+Fig 3: The Diffusion Transformer (DiT) architecture. Left: We train conditional latent DiT models. The input latent is decomposed into patches and processed by several DiT blocks. Right: Details of our DiT blocks. We experiment with variants of standard transformer blocks that incorporate conditioning via adaptive layer norm, cross-attention and extra input tokens. Adaptive layer norm works best.</p><p>The connection between portions of the pseudocode and Figure 3:
+<img loading=lazy src=../images/editDit.png alt=f4></p><pre tabindex=0><code>DiT(input_shape, patch_size, hidden_size, num_heads, num_layers, num_classes, cfg_dropout_prob)
+    Given x (B x C x H x W) - image, y (B) - class label, t (B) - diffusion timestep
+    x = patchify_flatten(x) # B x C x H x W -&gt; B x (H // P * W // P) x D, P is patch_size
+    x += pos_embed # see get_2d_sincos_pos_embed
+
+    t = compute_timestep_embedding(t) # Same as in UNet
+    if training:
+        y = dropout_classes(y, cfg_dropout_prob) # Randomly dropout to train unconditional image generation
+    y = Embedding(num_classes + 1, hidden_size)(y) # y = c (B x D)
+    c = t + y #c (B x D)
+
+    for _ in range(num_layers):
+        x = DiTBlock(hidden_size, num_heads)(x, c)  # x (B x L x D), c (B x D)
+
+    x = FinalLayer(hidden_size, patch_size, out_channels)(x)
+    x = unpatchify(x) # B x (H // P * W // P) x (P * P * 2C) -&gt; B x 2C x H x W
+    return x
+</code></pre><p>Based on the pseudocode, I&rsquo;ve constructed a mini DiT; the code is at the end of the document. This code isn&rsquo;t universally executable. For the full version of DiT, please refer to the paper&rsquo;s <a href=https://github.com/facebookresearch/DiT/tree/main>GitHub</a>.</p><h4 id=loss>Loss<a hidden class=anchor aria-hidden=true href=#loss>#</a></h4><p>The structure of the input and output are not the same. As mentioned in the paper, (reparameterize $\mu_{\phi}$), the model can be trained using a simple mean-squared error between the predicted noise $\epsilon_{\theta}(x_{t})$ and the sampled ground truth Gaussian noise $\epsilon_{t}$ (the z in the VAE).</p><p>However, to train diffusion models with a learned reverse process covariance, the full $D_{KL}$ term needs to be optimized.The following source code may help in understanding the loss:</p><pre tabindex=0><code>DiT/diffusion/diffusion_utils.py、
+def normal_kl(mean1, logvar1, mean2, logvar2):
+ return 0.5 * (
+        -1.0
+        + logvar2
+        - logvar1
+        + th.exp(logvar1 - logvar2)
+        + ((mean1 - mean2) ** 2) * th.exp(-logvar2)
+    )
+
+DiT/diffusion/gaussian_diffusion.py
+assert model_output.shape == target.shape == x_start.shape
+terms[&#34;mse&#34;] = mean_flat((target - model_output) ** 2)
+if &#34;vb&#34; in terms:
+                terms[&#34;loss&#34;] = terms[&#34;mse&#34;] + terms[&#34;vb&#34;]
+            else:
+                terms[&#34;loss&#34;] = terms[&#34;mse&#34;]
+
+p_sample
+ sample = out[&#34;mean&#34;] + nonzero_mask * th.exp(0.5 * out[&#34;log_variance&#34;]) * noise
+ return {&#34;sample&#34;: sample, &#34;pred_xstart&#34;: out[&#34;pred_xstart&#34;]}
+</code></pre><h3 id=code>code<a hidden class=anchor aria-hidden=true href=#code>#</a></h3><p>the final layer&rsquo;s out_channels is 2C.</p><pre tabindex=0><code>def get_1d_sincos_pos_embed_from_grid(embed_dim, pos):
+    assert embed_dim % 2 == 0
+    omega = torch.arange(embed_dim // 2, dtype=torch.float32)
+    omega /= (embed_dim // 2) / 2.0
+    omega = 1.0 / (10000 ** omega)  # (D/2,)
+
+    pos = pos.reshape(-1)  # (M,)
+    out = torch.einsum(&#39;m,d-&gt;md&#39;, pos, omega)  # (M, D/2), outer product
+
+    emb_sin = torch.sin(out)  # (M, D/2)
+    emb_cos = torch.cos(out)  # (M, D/2)
+
+    emb = torch.cat([emb_sin, emb_cos], dim=1)  # (M, D)
+    return emb
+
+def get_2d_sincos_pos_embed_from_grid(embed_dim, grid):
+    assert embed_dim % 2 == 0
+
+    # use half of dimensions to encode grid_h
+    emb_h = get_1d_sincos_pos_embed_from_grid(embed_dim // 2, grid[0])  # (H*W, D/2)
+    emb_w = get_1d_sincos_pos_embed_from_grid(embed_dim // 2, grid[1])  # (H*W, D/2)
+
+    emb = torch.cat([emb_h, emb_w], dim=1)  # (H*W, D)
+    return emb
+
+def get_2d_sincos_pos_embed(embed_dim, grid_size):
+    grid_h = torch.arange(grid_size).float()
+    grid_w = torch.arange(grid_size).float()
+    grid = torch.meshgrid(grid_w, grid_h)  # here w goes first
+    grid = torch.stack(grid, dim=0)
+
+    grid = grid.reshape(2, 1, grid_size, grid_size)
+    pos_embed = get_2d_sincos_pos_embed_from_grid(embed_dim, grid)
+    return pos_embed
+
+# Example usage:
+embed_dim = 768  # Example embedding dimension
+grid_size = 16   # Example grid size
+pos_embed = get_2d_sincos_pos_embed(embed_dim, grid_size)
+# get_2d_sincos_pos_embed(C * patch_size * patch_size, H // patch_size).reshape(1, H // patch_size * W // patch_size, -1).repeat(B, 1, 1)
+get_2d_sincos_pos_embed(2 * 4 * 4, 12 // 4).reshape(1, 3 * 3, -1).shape
+</code></pre><pre tabindex=0><code># @title DiTBlock
+
+def modulate(x, shift, scale):
+    return x * (1 + scale.unsqueeze(1)) + shift.unsqueeze(1)
+
+class DiTBlock(nn.Module):
+    def __init__(self, hidden_size, num_heads):
+        super(DiTBlock, self).__init__()
+        # Define the layers used in DiTBlock
+        self.silu = nn.SiLU()
+        self.linear_c = nn.Linear(hidden_size, 6 * hidden_size)
+        self.norm1 = nn.LayerNorm(hidden_size, elementwise_affine=False)
+        self.norm2 = nn.LayerNorm(hidden_size, elementwise_affine=False)
+        self.attention = nn.MultiheadAttention(hidden_size, num_heads)
+        # Define an MLP. Adjust the architecture as needed.
+        self.mlp = nn.Sequential(
+            nn.Linear(hidden_size, 4 * hidden_size),
+            nn.SiLU(),
+            nn.Linear(4 * hidden_size, hidden_size)
+        )
+
+    def forward(self, x, c):
+        # Process context vector
+        c = self.silu(c)
+        c = self.linear_c(c)
+        shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = c.chunk(6, dim=1)
+
+        # First half of the DiTBlock (MSA)
+        h = self.norm1(x)
+        h = modulate(h, shift_msa, scale_msa)
+        attn_output, _ = self.attention(h, h, h)
+        x = x + gate_msa.unsqueeze(1) * attn_output
+
+        # Second half of the DiTBlock (MLP)
+        h = self.norm2(x)
+        h = modulate(h, shift_mlp, scale_mlp)
+        mlp_output = self.mlp(h)
+        x = x + gate_mlp.unsqueeze(1) * mlp_output
+
+        return x
+</code></pre><pre tabindex=0><code># @title FinalLayer
+
+class FinalLayer(nn.Module):
+    def __init__(self, hidden_size, patch_size, out_channels):
+        super(FinalLayer, self).__init__()
+        # Define the layers used in FinalLayer
+        self.silu = nn.SiLU()
+        self.linear_c = nn.Linear(hidden_size, 2 * hidden_size)
+        self.norm = nn.LayerNorm(hidden_size, elementwise_affine=False)
+        self.final_linear = nn.Linear(hidden_size, patch_size * patch_size * out_channels)
+
+    def forward(self, x, c):
+        # Process context vector
+        c = self.silu(c)
+        c = self.linear_c(c)
+        shift, scale = c.chunk(2, dim=1)
+
+        # Apply LayerNorm and Modulation
+        x = self.norm(x)
+        x = modulate(x, shift, scale)
+
+        # Apply final linear layer
+        x = self.final_linear(x)
+        return x
+</code></pre><pre tabindex=0><code>
+def timestep_embedding(timesteps, dim, max_period=10000):
+    half_dim = dim // 2
+    device = timesteps.device
+    freqs = torch.exp(-torch.log(torch.tensor(max_period, device=device)) * torch.arange(0, half_dim, dtype=torch.float32, device=device) / half_dim)
+    args = timesteps[:, None].to(device=device, dtype=torch.float32) * freqs[None]
+    embedding = torch.cat([torch.cos(args), torch.sin(args)], dim=-1)
+    if dim % 2:
+        # If dim is odd, pad with a column of zeros
+        embedding = F.pad(embedding, (0, 1))
+    return embedding
+import torch
+
+def patchify_flatten(imgs, patch_size):
+    B, C, H, W = imgs.shape
+    patch_flat_dim = C * patch_size * patch_size
+    # Step 1: Reshape
+    imgs = imgs.reshape(B, C, H // patch_size, patch_size, W // patch_size, patch_size)
+    # Step 2: Transpose to B x num_patches x patch_flat_dim
+    imgs = imgs.permute(0, 2, 4, 3, 5, 1).reshape(B, -1, patch_flat_dim)
+    return imgs
+
+
+def unpatchify(x, patch_size, H, W):
+    &#34;&#34;&#34;
+    Args:
+    - x: the flattened patches tensor, shape (B, num_patches, patch_depth)
+    - patch_size: the size of one side of the square patch
+    - H: the height of the original image
+    - W: the width of the original image
+
+    Returns:
+    - img: the reconstructed image tensor, shape (B, C, H, W)
+    &#34;&#34;&#34;
+    B, num_patches, patch_depth = x.shape
+    C = patch_depth // (patch_size * patch_size)
+
+    # Step 1: Reshape to (B, H // patch_size, W // patch_size, patch_size, patch_size, C)
+    x = x.reshape(B, H // patch_size, W // patch_size, patch_size, patch_size, C)
+
+    # Step 2: Transpose to (B, C, H // patch_size, patch_size, W // patch_size, patch_size)
+    x = x.permute(0, 5, 1, 3, 2, 4)
+
+    # Step 3: Reshape to the original image shape (B, C, H, W)
+    img = x.reshape(B, C, H, W)
+
+    return img
+def dropout_classes(y, dropout_prob):
+        # During training, randomly set some entries to -1 to indicate the special no-class case
+    mask = torch.rand_like(y, dtype=torch.float32) &lt; dropout_prob
+    y[mask] = y_max+1;
+    return y
+
+
+class DiT(nn.Module):
+    # Initialization remains the same as previously provided
+    def __init__(self, input_shape, patch_size, hidden_size, num_heads, num_layers, num_classes, cfg_dropout_prob):
+        super(DiT, self).__init__()
+        self.patch_size = patch_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.cfg_dropout_prob = cfg_dropout_prob
+
+        # Assuming C, H, W are the channels, height, and width of the input
+        C, H, W = input_shape
+        self.D = C * (patch_size ** 2)  # Depth of the flattened patches
+        self.num_patches = (H // patch_size) * (W // patch_size)
+
+        grid_size = max(H // patch_size, W // patch_size)
+        self.pos_embed = get_2d_sincos_pos_embed(self.D , grid_size)
+
+        # Embedding layer for class labels
+        self.class_embedding = nn.Embedding(num_classes + 1, hidden_size)
+
+
+        # Stack of DiTBlocks
+        self.diT_blocks = nn.ModuleList([DiTBlock(hidden_size, num_heads) for _ in range(num_layers)])
+
+        # Final layer to map to output space
+        self.final_layer = FinalLayer(hidden_size, patch_size, 2 * C)
+
+    def forward(self, x, y, t, training=True):
+        B, C, H, W = x.shape
+
+        # Patchify and flatten input images
+        print(x.shape)
+        x = patchify_flatten(x, self.patch_size)  # Needs to be implemented
+
+        # Add positional embedding
+        print(x.shape)
+
+        x += self.pos_embed.reshape(1, H // self.patch_size * W // self.patch_size, -1).repeat(B, 1, 1)
+        print(x.shape)
+        # Compute timestep embedding using the PyTorch-based function
+        t_emb = timestep_embedding(t, C * self.patch_size * self.patch_size)
+        print(t_emb.shape)
+
+        # Apply dropout to class labels if training
+        if training:
+            y = dropout_classes(y, self.cfg_dropout_prob)
+
+        # Embed class labels
+        y_emb = self.class_embedding(y)
+        print(&#39;y_emb&#39;)
+        print(y_emb.shape)
+
+        # Combine timestep and class label embeddings
+        c = t_emb + y_emb
+
+        # Pass the input through DiTBlocks
+        for diT_block in self.diT_blocks:
+            x = diT_block(x, c)
+
+        # Pass the output through the final layer
+        x = self.final_layer(x, c)
+
+        # Unpatchify the output to obtain the final image
+        x = unpatchify(x, self.patch_size, H, W) 
+
+        return x
+</code></pre></div><footer class=post-footer><ul class=post-tags></ul><nav class=paginav><a class=next href=http://localhost:1313/log/posts/first/><span class=title>Next »</span><br><span>First Sample</span></a></nav></footer></article></main><footer class=footer><span>&copy; 2024 <a href=http://localhost:1313/log/>ExampleSite</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>
